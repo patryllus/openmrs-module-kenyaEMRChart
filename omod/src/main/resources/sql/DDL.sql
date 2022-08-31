@@ -1655,6 +1655,7 @@ SELECT "Successfully created etl_ART_preparation table";
 
   CREATE TABLE kenyaemr_etl.etl_prep_followup (
     uuid char(38),
+    form VARCHAR(50),
     provider INT(11),
     patient_id INT(11) NOT NULL,
     visit_id INT(11),
@@ -1715,7 +1716,8 @@ SELECT "Successfully created etl_ART_preparation table";
     CONSTRAINT FOREIGN KEY (patient_id) REFERENCES kenyaemr_etl.etl_patient_demographics(patient_id),
     CONSTRAINT unique_uuid UNIQUE(uuid),
     INDEX(visit_date),
-    INDEX(encounter_id)
+    INDEX(encounter_id),
+    INDEX(form)
   );
   SELECT "Successfully created etl_prep_followup table";
 

@@ -2728,7 +2728,6 @@ INSERT INTO kenyaemr_etl.etl_hts_referral_and_linkage (
   ccc_number,
   provider_handed_to,
   cadre,
-  remarks,
   voided
 )
   select
@@ -2755,12 +2754,11 @@ INSERT INTO kenyaemr_etl.etl_hts_referral_and_linkage (
                                 when 1540 then "Employee"
                                 when 5488 then "Adherence counsellor"
                                 when 5622 then "Other" else "" end),null)) as cadre,
-	max(if(o.concept_id=163042,trim(o.value_text),null)) as remarks,
     e.voided
   from encounter e
 		inner join person p on p.person_id=e.patient_id and p.voided=0
 		inner join form f on f.form_id = e.form_id and f.uuid in ("050a7f12-5c52-4cad-8834-863695af335d","15ed03d2-c972-11e9-a32f-2a2ae2dbcce4")
-  left outer join obs o on o.encounter_id = e.encounter_id and o.concept_id in (164966, 159811, 162724, 160555, 159599, 162053, 1473,162577,160481,163042) and o.voided=0
+  left outer join obs o on o.encounter_id = e.encounter_id and o.concept_id in (164966, 159811, 162724, 160555, 159599, 162053, 1473,162577,160481) and o.voided=0
   where e.voided=0
   group by e.patient_id,e.visit_id;
   SELECT "Completed processing hts linkages";
@@ -5284,8 +5282,6 @@ CREATE PROCEDURE sp_populate_etl_client_trace()
             cerv_cancer_treated,
             cerv_cancer_referred,
             cerv_cancer_text,
-            anal_cancer_screened,
-            anal_cancer_results,
             prep_screened,
             prep_results,
             prep_treated,
@@ -5312,7 +5308,7 @@ CREATE PROCEDURE sp_populate_etl_client_trace()
             mental_health_referred,
             mental_health_text,
             mat_screened,
---            mat_results,
+            mat_results,
             mat_treated,
             mat_referred,
             mat_text,
@@ -5415,8 +5411,6 @@ CREATE PROCEDURE sp_populate_etl_client_trace()
                max(if(o.concept_id=165266,(case o.value_coded when 1065 then "Yes" when 1066 THEN "No" else "" end),null)) as cerv_cancer_treated,
                max(if(o.concept_id=165267,(case o.value_coded when 1065 then "Yes" when 1066 THEN "No" else "" end),null)) as cerv_cancer_referred,
                max(if(o.concept_id=165268,o.value_text,null)) as cerv_cancer_text,
-               max(if(o.concept_id=116030,(case o.value_coded when 1065 then "Yes" when 1066 THEN "No" when 1175 then "NA" else "" end),null)) as anal_cancer_screened,
-               max(if(o.concept_id=166664,(case o.value_coded when 162743 then "Suspected" when 1302 THEN "Not Suspected" else "" end),null)) as anal_cancer_results,
                max(if(o.concept_id=165076,(case o.value_coded when 1065 then "Yes" when 1066 THEN "No" when 165080 then "Ongoing" else "" end),null)) as prep_screened,
                max(if(o.concept_id=165202,(case o.value_coded when 165087 then "Eligible" when 165078 THEN "Not eligible" else "" end),null)) as prep_results,
                max(if(o.concept_id=165203,(case o.value_coded when 1065 then "Y" when 1066 THEN "N" else "" end),null)) as prep_treated,
@@ -5443,7 +5437,7 @@ CREATE PROCEDURE sp_populate_etl_client_trace()
                max(if(o.concept_id=165281,(case o.value_coded when 1065 THEN "Yes" when 1066 then "No" else "" end),null)) as mental_health_referred,
                max(if(o.concept_id=165282,o.value_text,null)) as mental_health_text,
                max(if(o.concept_id=166663,(case o.value_coded when 1065 then "Yes" when 1066 THEN "No" else "" end),null)) as mat_screened,
---               max(if(o.concept_id=166664,(case o.value_coded when 703 then "Positive" when 664 THEN "Negative"  else "" end),null)) as mat_results,
+               max(if(o.concept_id=166664,(case o.value_coded when 703 then "Positive" when 664 THEN "Negative"  else "" end),null)) as mat_results,
                max(if(o.concept_id=165052,(case o.value_coded when 1065 then "Yes" when 1066 THEN "No" else "" end),null)) as mat_treated,
                max(if(o.concept_id=165093,(case o.value_coded when 1065 THEN "Yes" when 1066 then "No" else "" end),null)) as mat_referred,
                max(if(o.concept_id=166637,o.value_text,null)) as mental_health_text,
@@ -5499,7 +5493,7 @@ CREATE PROCEDURE sp_populate_etl_client_trace()
                left outer join obs o on o.encounter_id=e.encounter_id and o.voided=0
                                           and o.concept_id in (165347,164181,164082,160540,161558,165199,165200,165249,165250,165197,165198,1111,162310,163323,165040,1322,165251,165252,165253,
                 165041,161471,165254,165255,165256,165042,165046,165257,165201,165258,165259,165044,165051,165260,165261,165262,165043,165047,165263,165264,165265,
-                164934,165196,165266,165267,165268,116030,165076,165202,165203,165270,165271,165204,165205,165208,165273,165274,165045,165050,165053,161595,165277,1382,
+                164934,165196,165266,165267,165268,165076,165202,165203,165270,165271,165204,165205,165208,165273,165274,165045,165050,165053,161595,165277,1382,
                 165209,160653,165279,165280,165210,165211,165213,165281,165282,166663,166664,165052,166637,165093,165214,165215,159382,164401,165218,164848,159427,1648,163042,165220,165221,165222,165223,
                 164952,164400,165231,165233,165234,165237,162724,165238,161562,165239,163042,165240,160119,165242,165243,165246,165247,164820,165302,163766,165055,165056,
                 165057,165058,164845,165248,5096,164142)
@@ -7199,7 +7193,7 @@ BEGIN
              left outer join concept_set cs on o.concept_id = cs.concept_id  and do.dose_units = cs.concept_id and do.quantity_units = cs.concept_id and do.route = cs.concept_id
     where o.voided = 0
       and o.order_type_id = 2
-      and ((o.order_action = 'NEW' and o.date_stopped is not null) or (o.order_reason_non_coded = 'previously existing orders'))
+      and ((o.order_action = 'NEW') or (o.order_reason_non_coded = 'previously existing orders'))
       and e.voided = 0
     group by o.order_group_id,o.patient_id, o.encounter_id;
 
@@ -8014,6 +8008,7 @@ CALL sp_populate_etl_progress_note();
 CALL sp_populate_etl_prep_discontinuation();
 CALL sp_populate_etl_hts_linkage_tracing();
 CALL sp_populate_etl_patient_program();
+CALL sp_update_dashboard_table();
 CALL sp_create_default_facility_table();
 CALL sp_populate_etl_person_address();
 CALL sp_populate_etl_otz_enrollment();
@@ -8053,7 +8048,6 @@ CALL sp_populate_etl_art_fast_track();
 CALL sp_populate_etl_clinical_encounter();
 CALL sp_populate_etl_daily_revenue_summary();
 CALL sp_update_next_appointment_date();
-CALL sp_update_dashboard_table();
 
 UPDATE kenyaemr_etl.etl_script_status SET stop_time=NOW() where id= populate_script_id;
 

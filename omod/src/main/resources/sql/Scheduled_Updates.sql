@@ -3951,6 +3951,7 @@ CREATE PROCEDURE sp_update_etl_prep_followup(IN last_update_time DATETIME)
         condoms_issued,
         number_of_condoms,
         appointment_given,
+		appointment_date,
         reason_no_appointment,
         clinical_notes,
         voided
@@ -4022,6 +4023,7 @@ CREATE PROCEDURE sp_update_etl_prep_followup(IN last_update_time DATETIME)
         max(if(o.concept_id = 159777, (case o.value_coded when 1065 then "Yes" when 1066 then "No" else "" end), "" )) as condoms_issued,
         max(if(o.concept_id = 165055, o.value_numeric, null )) as number_of_condoms,
         max(if(o.concept_id = 165353, (case o.value_coded when 1065 then "Yes" when 1066 then "No" else "" end), "" )) as appointment_given,
+		max(if(o.concept_id = 5096, o.value_datetime, null )) as appointment_date,
         max(if(o.concept_id = 165354, (case o.value_coded when 165053 then "Risk will no longer exist" when 159492 then "Intention to transfer out" else "" end), "" )) as reason_no_appointment,
         max(if(o.concept_id = 163042, o.value_text, null )) as clinical_notes,
         e.voided
